@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KFFL Rewards Tracking</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .form-group {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body style="background-color: #f0f2f5;">
+
+    <nav class="navbar navbar-dark bg-secondary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Winner's List</a>
+            <ul class="navbar-nav ml-auto">
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Log out</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Log in</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Awards Points</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Winner Name</th>
+                                        <th>Points</th>
+                                        {% if current_user.is_authenticated %}
+                                        <th>Action</th>
+                                        {% endif %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for winner in winners %}
+                                    <tr>
+                                        <td>{{ winner.name }}</td>
+                                        <td>{{ winner.points }}</td>
+                                        {% if current_user.is_authenticated %}
+                                        <td>
+                                            <form action="/add_points/{{ winner.id }}" method="post">
+                                                <button type="submit" class="btn btn-success btn-sm" style="margin:5px;"> +  Point</button>
+                                            </form>
+                                            <form action="/remove_points/{{ winner.id }}" method="post">
+                                                <button type="submit" class="btn btn-danger btn-sm ml-2" style="margin:5px;"> -  Point</button>
+                                            </form>
+                                        </td>
+                                        {% endif %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if current_user.is_authenticated %}
+                        <form action="/add_winner" method="post">
+                            <div class="form-group">
+                                <label for="winner_name">Winner Name:</label>
+                                <input type="text" name="winner_name" class="form-control" id="winner_name" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Winner</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Comments</h3>
+                        <ul class="list-group list-group-flush">
+                            {% for comment in comments %}
+                                <li class="list-group-item">
+                                    {{ comment.content }}
+                                    <small class="text-muted d-block m-2">
+                                        Posted by {% if comment.commenter %}{{ comment.commenter.username }}{% else %}anonymous{% endif %} on {{ comment.posted.strftime("%A, %d %B %Y at %H:%M") }}
+                                    </small>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% if current_user.is_authenticated %}
+                    <form action="." method="POST" class="m-3">
+                        <div class="form-group">
+                            <textarea name="contents" class="form-control" placeholder="Enter a comment"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block mt-3">Post Comment</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
